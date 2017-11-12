@@ -8,12 +8,9 @@ import sun.misc.Unsafe;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class MemoryHandler extends UnsafeClass{
+public final class MemoryHandler extends UnsafeClass {
 
     private MemoryUtils memUtils;
-    private boolean shouldDebug = false;
-    private boolean cachedSizeOf = true;
     private Map<Class<?>, Long> sizes;
 
     public MemoryHandler(Unsafe theUnsafe, MemoryUtils utils) {
@@ -26,21 +23,8 @@ public class MemoryHandler extends UnsafeClass{
         this.sizes.putIfAbsent(object, size);
     }
 
-    public void setCachedSizeOf(boolean cachedSizeOf){
-        this.cachedSizeOf = cachedSizeOf;
-    }
-
-    protected void updateDebug(){
-        this.shouldDebug = Core.getCore().shouldDebug();
-    }
-
     public Pointer<?> allocMemory(long size) {
         return new BytePointer(theUnsafe.allocateMemory(size));
-    }
-
-    void freePointer(Pointer ptr){
-        theUnsafe.freeMemory(ptr.getAddress());
-
     }
 
     private void replaceClassToRClass(Class<?>[] arr){
@@ -73,24 +57,16 @@ public class MemoryHandler extends UnsafeClass{
             replaceClassToRClass(argsClassesArray);
             Object tempInst2 = theUnsafe.allocateInstance(type);
             long sizeOf;
-            if(cachedSizeOf) {
-                if (sizes.containsKey(type)) {
-                    sizeOf = sizes.get(type);
-                } else {
-                    sizeOf = memUtils.sizeOf(tempInst2);
-                    sizes.put(type, sizeOf);
-                }
+            if (sizes.containsKey(type)) {
+                sizeOf = sizes.get(type);
             } else {
                 sizeOf = memUtils.sizeOf(tempInst2);
+                sizes.put(type, sizeOf);
             }
             memUtils.memoryMove(memUtils.getAddress(type.getConstructor(argsClassesArray)
                                     .newInstance(argsObjectsArray)),
                     memUtils.getAddress(tempInst2),
-                    memUtils.sizeOf(tempInst2));
-            if(shouldDebug) {
-                System.out.println("Size of " + type.getName() + ": " + memUtils.sizeOf(tempInst2) + " bytes");
-                memUtils.memoryPrint(memUtils.getAddress(tempInst2), 2);
-            }
+                    sizeOf);
             return new ClassPointer<>(memUtils.getAddress(tempInst2));
 
 

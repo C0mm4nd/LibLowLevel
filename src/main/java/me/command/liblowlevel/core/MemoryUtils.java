@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
-public class MemoryUtils extends UnsafeClass {
+public final class MemoryUtils extends UnsafeClass {
 
     MemoryUtils(Unsafe theUnsafe){
         super(theUnsafe);
