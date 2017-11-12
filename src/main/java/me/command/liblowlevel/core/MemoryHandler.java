@@ -43,11 +43,34 @@ public class MemoryHandler extends UnsafeClass{
 
     }
 
+    private void replaceClassToRClass(Class<?>[] arr){
+        for (int i = 0; i < arr.length; i++) {
+            Class<?> klass = arr[i];
+            if(klass.equals(Boolean.class))
+                arr[i] = boolean.class;
+            else if(klass.equals(Byte.class))
+                arr[i] = byte.class;
+            else if(klass.equals(Character.class))
+                arr[i] = char.class;
+            else if(klass.equals(Short.class))
+                arr[i] = short.class;
+            else if(klass.equals(Integer.class))
+                arr[i] = int.class;
+            else if(klass.equals(Float.class))
+                arr[i] = float.class;
+            else if(klass.equals(Long.class))
+                arr[i] = long.class;
+            else if(klass.equals(Double.class))
+                arr[i] = double.class;
+        }
+    }
+
     public <T> ClassPointer<T> allocatePointer(Class<T> type, Object... argsObjectsArray) throws RuntimeException{
         try {
-            Class<?> argsClassesArray[] = new Class[argsObjectsArray.length];
+            Class<?>[] argsClassesArray = new Class[argsObjectsArray.length];
             for(int i = 0; i < argsObjectsArray.length; i++)
                 argsClassesArray[i] = argsObjectsArray[i].getClass();
+            replaceClassToRClass(argsClassesArray);
             Object tempInst2 = theUnsafe.allocateInstance(type);
             long sizeOf;
             if(cachedSizeOf) {

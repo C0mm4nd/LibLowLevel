@@ -55,30 +55,4 @@ public class Core {
     public MemoryUtils getMemoryUtils(){ return memoryUtils; }
     public MemoryHandler getMemoryHandler(){ return memoryHandler; }
 
-    public static void main(String... args){
-        getCore().enableDebug();
-        long time = System.nanoTime();
-        ClassPointer<?> ptr = getCore().getMemoryHandler().allocatePointer(String.class, "Hello World bby");
-        long time2 = System.nanoTime();
-        System.out.printf("\nSeconds for a pointer instance: %fs\n", ((time2-time)/1000000000.0D));
-        time = System.nanoTime();
-        String s = new String("Hello World bby");
-        time2 = System.nanoTime();
-        System.out.printf("Seconds for a java instance: %fs\n", ((time2-time)/1000000000.0D));
-
-        System.out.format("\n\nMy pointer address: 0x%016X\n", ptr.getAddress());
-        System.out.format("Random object addr: 0x%016X\n", Core.getCore().memoryUtils.getAddress(new Object()));
-
-        Pointer p = getCore().getMemoryHandler().allocMemory(1);
-        IntPointer intPointer = Pointers.cast(p, IntPointer.class);
-        for(int i = 0; i<10; i++){
-            System.out.printf("Pointee #%d: %08X\n", i, p.getPointee());
-            p.increment(1);
-        }
-        BytePointer bytePointer = Pointers.cast(intPointer, BytePointer.class);
-        for(int i = 0; i<10; i++){
-            System.out.printf("Pointee #%d: %02X\n", i, p.getPointee());
-            p.decrement(1);
-        }
-    }
 }

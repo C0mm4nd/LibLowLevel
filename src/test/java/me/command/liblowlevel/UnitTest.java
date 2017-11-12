@@ -1,6 +1,5 @@
 package me.command.liblowlevel;
 
-import me.command.liblowlevel.core.Core;
 import me.command.liblowlevel.core.MemoryHandler;
 import me.command.liblowlevel.pointer.Pointer;
 import org.junit.jupiter.api.*;
@@ -12,58 +11,52 @@ import static me.command.liblowlevel.core.Core.getCore;
 @ExtendWith(TestUtils.class)
 class UnitTest {
 
-    static MemoryHandler handler = getCore().getMemoryHandler();
+    private static MemoryHandler handler = getCore().getMemoryHandler();
 
     @BeforeAll
-    public static void hook(){
+    static void hook(){
         registerHook("cached", () -> handler.setCachedSizeOf(true));
         registerHook("noCached", () -> handler.setCachedSizeOf(false));
-        registerHook("debug", Core.getCore()::enableDebug);
-        registerHook("noDebug", Core.getCore()::disableDebug);
-        handler.addSize(String.class, 24);
+        registerHook("debug", getCore()::enableDebug);
+        handler.addSize(Integer.class, 16);
     }
 
     @Tag("debug")
     @Tag("noCached")
-    @Timed
-    @RepeatedTest(10)
+    @TimedTest
     @DisplayName("Pointer creation (debug)")
     void pointerCreation(){
-        Pointer<?> ptr = handler.allocatePointer(String.class, "Pointer creation debug");
+        Pointer<?> ptr = handler.allocatePointer(Integer.class, 10);
     }
 
     @Tag("noDebug")
     @Tag("noCached")
-    @Timed
-    @RepeatedTest(10)
+    @TimedTest
     @DisplayName("Pointer creation (no debug)")
     void pointerCreationNoDebug(){
-        Pointer<?> ptr = handler.allocatePointer(String.class, "Pointer creation no debug");
+        Pointer<?> ptr = handler.allocatePointer(Integer.class, 10);
     }
 
     @Tag("debug")
     @Tag("cached")
-    @Timed
-    @RepeatedTest(10)
+    @TimedTest
     @DisplayName("Pointer creation (debug, cached size)")
     void pointerCreationCachedSize(){
-        Pointer<?> ptr = handler.allocatePointer(String.class, "Pointer creation cached");
+        Pointer<?> ptr = handler.allocatePointer(Integer.class, 10);
     }
 
     @Tag("noDebug")
     @Tag("cached")
-    @Timed
-    @RepeatedTest(10)
+    @TimedTest
     @DisplayName("Pointer creation (no debug, cached size)")
     void pointerCreationCachedSizeNoDebug(){
-        Pointer<?> ptr = handler.allocatePointer(String.class, "Pointer creation cached no debug");
+        Pointer<?> ptr = handler.allocatePointer(Integer.class, 10);
     }
 
-    @Timed
-    @RepeatedTest(10)
+    @TimedTest
     @DisplayName("Java instance creation")
     void instanceCreation(){
-        String str = "Hello World";
+        Integer integer = new Integer(10);
     }
 
 

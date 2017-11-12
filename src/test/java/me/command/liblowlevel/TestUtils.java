@@ -9,16 +9,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class TestUtils implements AfterAllCallback, AfterTestExecutionCallback, BeforeTestExecutionCallback, BeforeEachCallback, AfterEachCallback {
 
     private static final String START_TIME = "start_time";
     private Map<Method, List<Long>> timings = new HashMap<>();
-    private static Map<String, Runnable> hooks = new HashMap<>();
+    private static Map<String, Function<ExtensionContext, Void>> hooks = new HashMap<>();
 
     boolean timedTest = false;
 
     public static void registerHook(String tag, Runnable hook){
+        registerHook(tag, new Function<ExtensionContext, Void>() {
+            Runnable hookInternal = hook;
+            @Override
+            public Void apply(ExtensionContext extensionContext) {
+                hookInternal.run();
+                return null;
+            }
+        });
+    }
+
+    public static void registerHook(String tag, Function<ExtensionContext, Void> hook) {
         hooks.putIfAbsent(tag, hook);
     }
 
@@ -35,7 +47,7 @@ public class TestUtils implements AfterAllCallback, AfterTestExecutionCallback, 
     @Override
     public void beforeTestExecution(ExtensionContext context) throws Exception {
         for(String tag:hooks.keySet()){
-            doIfCondition(hasTag(context, tag), hooks.get(tag));
+            doIfCondition(hasTag(context, tag), hooks.get(tag), context);
         }
         doIfCondition(hasTag(context, "timed"), () -> {
             timings.putIfAbsent(context.getRequiredTestMethod(), new ArrayList<>());
@@ -93,6 +105,12 @@ public class TestUtils implements AfterAllCallback, AfterTestExecutionCallback, 
 
     private boolean hasTag(ExtensionContext ec, String tag){
         return ec.getTags().contains(tag);
+    }
+
+    private void doIfCondition(boolean condition,
+                               Function<ExtensionContext, Void> run,
+                               ExtensionContext ctx){
+        if(condition) run.apply(ctx);
     }
 
     private void doIfCondition(boolean condition, Runnable run){

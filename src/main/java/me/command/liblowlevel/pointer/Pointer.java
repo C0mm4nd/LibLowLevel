@@ -31,6 +31,10 @@ public abstract class Pointer<T> {
         return pointee;
     }
 
+    public void free(){
+        theUnsafe.freeMemory(pointee);
+    }
+
     public abstract T getPointee();
 
     public abstract void setPointee(T to);

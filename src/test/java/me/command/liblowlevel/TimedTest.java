@@ -1,5 +1,6 @@
 package me.command.liblowlevel;
 
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Tag;
 
 import java.lang.annotation.ElementType;
@@ -10,5 +11,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("timed")
-public @interface Timed {
+@RepeatedTest(10)
+public @interface TimedTest {
 }
